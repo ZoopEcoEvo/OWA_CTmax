@@ -16,4 +16,6 @@ guide = data.frame(user, date, tube = c(1:n),
                    lineage = sample(lineages, size = n, replace = T),
                    replicate = NA)
 
-write.csv(guide, file = paste("setup-", Sys.Date(), ".csv", sep = ""))
+file_name = str_replace_all(Sys.Date(), pattern = "-", "_")
+
+write.csv(guide, file = paste(file_name, "_setup", ".csv", sep = ""), row.names = F)

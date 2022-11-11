@@ -1,20 +1,14 @@
 # Load in required packages
 library(rmarkdown)
 library(tidyverse)
-library()
 
 #Determine which scripts should be run
-process_data = F #Runs data analysis 
+process_all_data = T #Runs data analysis for all files, rather than just new files
 make_report = F #Runs project summary
 knit_manuscript = F #Compiles manuscript draft
 
-############################
-### Read in the RAW data ###
-############################
-
-if(process_data = T){
-  source(file = "Scripts/01_data_processing.R")
-}
+# Runs data analysis (data is read in during the for loop; nothing to read in here)
+source(file = "Scripts/01_data_processing.R")
 
 ##################################
 ### Read in the PROCESSED data ###
