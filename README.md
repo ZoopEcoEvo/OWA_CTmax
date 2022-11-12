@@ -1,4 +1,4 @@
-# Does long term exposure to different climate change scenarios affect copepod thermal limts?
+# Does long term exposure to different climate change scenarios affect copepod thermal limits?
 
 Matthew Sasaki & Mathew Holmes-Hackerd, Rowan Batts, Lisa Piastuch, Hans Dam
 
