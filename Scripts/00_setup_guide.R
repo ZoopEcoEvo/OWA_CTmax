@@ -8,7 +8,7 @@ user = "MCS" #First, middle, and last initial
 ### Do not alter anything below this line ###
 #############################################
 
-date = Sys.Date()
+date = Sys.Date() + 1
 lineages = c("AA", "AH", "HA", "HH")
 n = 10
 
@@ -16,6 +16,6 @@ guide = data.frame(user, date, tube = c(1:n),
                    lineage = sample(lineages, size = n, replace = T),
                    replicate = NA)
 
-file_name = str_replace_all(Sys.Date(), pattern = "-", "_")
+file_name = gsub(x = date, pattern = "-", replacement = "_")
 
 write.csv(guide, file = paste(file_name, "_setup", ".csv", sep = ""), row.names = F)
