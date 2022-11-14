@@ -1,6 +1,6 @@
 # To generate the setup guide:
 # Update this value when you run the script by replacing the three letters inside the quotation marks
-user = "MCS" #First, middle, and last initial
+user = "MS" #First, middle, and last initial
 
 # Hit the "Source" button in the top right corner of this window
 
