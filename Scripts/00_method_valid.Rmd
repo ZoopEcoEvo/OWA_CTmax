@@ -1,0 +1,73 @@
+---
+title: "Methodological Validation"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+
+tubes = read_csv(file = "Data/method_valid/tube_pH.csv")
+holding = read_csv(file = "Data/method_valid/pH_tests.csv")
+```
+
+# Summary
+1. Acidify water at the beginning of each experiment. 
+2. Use capped 50 mL falcon tubes for the holding period. 
+3. Increase the volume of water in the CTmax assay tubes, and keep them covered. 
+
+# Acidified water storage and overnight holding   
+The experiment requires holding copepods for 24 hours in food solution, pre-acclimated to their "home" pH and temperature conditions. Filtered seawater was acidified and divided among a series of containers, either large 6L containers (red buckets) or small cups (150 mL volumes). Buckets were kept with their lids firmly attached, but were otherwise unaltered. Tetraselmis was added to the cups (3 mL: ~800 ugC/L), which were then "capped" by placing a large petri dish lid over the opening. Several of these cups were also wrapped in foil to block out light. Both cups and buckets were then divided between the 18C walk-in chamber and the 22C standing incubator.   
+
+During the 24 hour holding period the water in both the cups (0.15 L) and buckets (2 L) underwent substantial changes in pH. Ambient seawater 'controls' in two of the buckets did not change substantially. There was also no obvious difference between temperature treatments. 
+
+```{r}
+ggplot(holding, aes(x = hrs, y = pH, colour = factor(temp), group = vessel_id)) + 
+facet_wrap(volume~.) + 
+  geom_hline(yintercept = c(7.5, 8)) + 
+  geom_point(size = 2) +
+  geom_line(size = 1) + 
+  scale_colour_manual(values = c(
+    "18" = "darkslategray4", 
+    "22" = "tomato1"
+  )) + 
+  theme_bw(base_size = 18) + 
+  theme(panel.grid = element_blank())
+```
+
+Further there was no obvious effect of light exposure, with the pH of water in covered and uncovered cups changing in similar ways. 
+```{r}
+holding %>%  
+  filter(!str_detect(vessel_id, pattern = "_")) %>% 
+  ggplot(aes(x = hrs, y = pH, colour = factor(temp), linetype = light, group = vessel_id)) + 
+  geom_hline(yintercept = c(7.5, 8)) + 
+  geom_point(size = 2) +
+  geom_line(size = 1) + 
+  scale_colour_manual(values = c(
+    "18" = "darkslategray4", 
+    "22" = "tomato1"
+  )) + 
+  scale_x_continuous(breaks = c(0,24)) +
+  labs(x = "Hours passed", 
+       y = "pH", 
+       colour = "Temperature\n(degC)",
+       linetype = "Light") + 
+  theme_bw(base_size = 18) + 
+  theme(panel.grid = element_blank())
+```
+
+# CTmax trial pH 
+In addition to the holding period, we also examined how pH changed in the glass tubes used during the CTmax assay. Tubes were filled with 10 mL of pre-acidified filtered seawater. Half of the tubes remained at room temperature (rt), while the other half were placed in the water bath (wb). After the intial measurements, the water heater was turned on and tubes in the water bath experienced a temperature ramp similar to what would normally be exprienced during a CTmax assay. All room temperature tubes were left uncovered, while several of the water bath tubes were covered as water temperatures increased. There was some increase in pH during the assay. Covered tubes in the water bath appeared to change less, suggesting covering the tubes is important. 
+```{r}
+ggplot(tubes, aes(x = time, y = pH, group = tube, colour = temp, linetype = cover)) + 
+  facet_wrap(volume~.) +  
+  geom_line(size = 2) + 
+  scale_colour_manual(values = c(
+    "rt" = "slateblue",
+    "wb" = "coral"
+  )) + 
+  theme_bw(base_size = 18) + 
+  theme(panel.grid = element_blank())
+```
+
+
