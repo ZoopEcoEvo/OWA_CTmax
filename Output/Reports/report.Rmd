@@ -40,3 +40,12 @@ theme_matt = function(base_size){
     )
 }
 ```
+
+```{r}
+ggplot(full_data, aes(x = lineage, y = ctmax)) + 
+  geom_boxplot() + 
+  geom_point() + 
+  theme_matt(base_size = 18)
+```
+
+

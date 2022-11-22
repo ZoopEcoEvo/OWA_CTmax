@@ -44,6 +44,7 @@ Further there was no obvious effect of light exposure, with the pH of water in c
 holding %>%  
   filter(!str_detect(vessel_id, pattern = "_")) %>% 
   ggplot(aes(x = hrs, y = pH, colour = factor(temp), linetype = light, group = vessel_id)) + 
+  facet_wrap(volume~.) + 
   geom_hline(yintercept = c(7.5, 8)) + 
   geom_point(size = 2) +
   geom_line(size = 1) + 
