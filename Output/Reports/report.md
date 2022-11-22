@@ -5,10 +5,12 @@ OWA Lineage CTmax Project
 -   <a href="#sample-sizes" id="toc-sample-sizes">Sample sizes</a>
 -   <a href="#trait-measurements" id="toc-trait-measurements">Trait
     measurements</a>
+    -   <a href="#body-length" id="toc-body-length">Body length</a>
+    -   <a href="#ctmax" id="toc-ctmax">CTmax</a>
 -   <a href="#trait-correlations" id="toc-trait-correlations">Trait
     correlations</a>
 
-### Sample sizes
+# Sample sizes
 
 This summary reports the results of 1 replicate CTmax trials. The four
 lineages were sampled randomly for each replicate experiment, with one
@@ -21,11 +23,15 @@ replicate culture per lineage per run.
 | HA      |   2 |
 | HH      |   3 |
 
-### Trait measurements
+# Trait measurements
+
+## Body length
 
 All copepods were measured after the CTmax assay. These length
 measurements are shown below.
 <img src="../Figures/markdown/lineage-lengths-1.png" style="display: block; margin: auto;" />
+
+## CTmax
 
 The focal trait was the thermal limit, measured here as CTmax - the
 critical thermal maximum. During these assays, temperature increases at
@@ -44,9 +50,10 @@ shown below.
 
 <img src="../Figures/markdown/lineage-ctmax-1.png" style="display: block; margin: auto;" />
 
-### Trait correlations
+# Trait correlations
 
 Across species, thermal limits tend to decrease with increasing body
 size. The relationship between measured lengths and CTmax from these
 assays is shown below.
+
 <img src="../Figures/markdown/length-ctmax-1.png" style="display: block; margin: auto;" />
