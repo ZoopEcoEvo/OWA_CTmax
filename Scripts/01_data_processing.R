@@ -43,12 +43,11 @@ if(length(new_runs) > 0){ # If there are new data files to process...
       mutate(time = (minute + (second / 60)) - 2, # Accounts for the two minute start up delay in the temperature logger
              "rank" = dense_rank(desc(time)))
     
-    if(paste(file_name, "_length.csv", collapse = "", sep = "") %in% dir("Data/body_size/")){
-      length_data = read_csv(paste("Data/body_size/", file_name, "_length.csv", collapse = "", sep = ""))
+    if(paste(file_name, "_length.csv", collapse = "", sep = "") %in% dir("Data/length_data/")){
+      length_data = read_csv(paste("Data/length_data/", file_name, "_length.csv", collapse = "", sep = ""))
     }else{
       length_data = tibble("tube" = time_data$tube,
-                           "length" = NA,
-                           "sex" = NA)}
+                           "length" = NA)}
     
     setup = read_csv(paste("Data/setups/", file_name, "_setup.csv", collapse = "", sep = ""))
     
@@ -72,7 +71,7 @@ if(length(new_runs) > 0){ # If there are new data files to process...
       inner_join(select(setup, -date), by = c("tube")) %>% 
       mutate(date = lubridate::as_date(str_replace_all(file_name, pattern = "_", "-")),
              run = run_id) %>% 
-      select(date, user, run, tube, lineage, replicate, rank, length, sex, time, ramp_rate, ctmax)
+      select(date, user, run, tube, lineage, replicate, rank, length, time, ramp_rate, ctmax)
     
     write.csv(ct_data, file = paste("Output/Data/", file_name, "_ctmax.csv", sep = "", collapse = ""), row.names = F)
     

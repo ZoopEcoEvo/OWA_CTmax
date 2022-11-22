@@ -39,13 +39,48 @@ theme_matt = function(base_size){
       title = element_text(size = base_size * 1.55)
     )
 }
+
+lineage_cols = c("AA" = "#0C7BDF",
+                 "AH" = "#009D77", 
+                 "HA" = "#FFA602", 
+                 "HH" = "#D55D07")
 ```
 
 ```{r}
-ggplot(full_data, aes(x = lineage, y = ctmax)) + 
+knitr::kable(table(full_data$lineage))
+```
+
+```{r}
+ggplot(full_data, aes(x = lineage, y = length, fill = lineage)) + 
   geom_boxplot() + 
-  geom_point() + 
+  geom_point(size = 2, position = position_jitter(width = 0.1, height = 0)) + 
+  scale_fill_manual(values = lineage_cols) + 
+  labs(x = "Lineage", 
+       y = "Length (mm)") + 
+  theme_matt(base_size = 18) + 
+  theme(legend.position = "none")
+```
+
+```{r}
+ggplot(full_data, aes(x = lineage, y = ctmax, fill = lineage)) + 
+  geom_boxplot() + 
+  geom_point(position = position_jitter(width = 0.1, height = 0)) + 
+  scale_fill_manual(values = lineage_cols) + 
+  labs(x = "Lineage", 
+       y = "CTmax (degrees C)") + 
+  theme_matt(base_size = 18) + 
+  theme(legend.position = "none")
+```
+
+```{r}
+ggplot(full_data, aes(x = length, y = ctmax)) + 
+  geom_smooth(method = "lm", colour = "black") + 
+  geom_point(size = 2, aes(colour = lineage)) + 
+  scale_colour_manual(values = lineage_cols) + 
+  labs(x = "Length (mm)", 
+       y = "CTmax (degrees C)") + 
   theme_matt(base_size = 18)
 ```
+
 
 
