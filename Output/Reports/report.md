@@ -1,6 +1,6 @@
 OWA Lineage CTmax Project
 ================
-2022-11-22
+2022-11-28
 
 -   <a href="#sample-sizes" id="toc-sample-sizes">Sample sizes</a>
 -   <a href="#trait-measurements" id="toc-trait-measurements">Trait
@@ -12,16 +12,16 @@ OWA Lineage CTmax Project
 
 # Sample sizes
 
-This summary reports the results of 1 replicate CTmax trials. The four
+This summary reports the results of 2 replicate CTmax trials. The four
 lineages were sampled randomly for each replicate experiment, with one
 replicate culture per lineage per run.
 
 | lineage |   n |
 |:--------|----:|
-| AA      |   2 |
-| AH      |   3 |
-| HA      |   2 |
-| HH      |   3 |
+| AA      |   6 |
+| AH      |   4 |
+| HA      |   4 |
+| HH      |   6 |
 
 # Trait measurements
 
