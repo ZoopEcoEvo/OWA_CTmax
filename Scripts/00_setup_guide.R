@@ -9,11 +9,11 @@ user = "MCS" #First, middle, and last initial
 #############################################
 
 date = Sys.Date() + 1
-lineages = c("AA", "AH", "HA", "HH")
+lineages = rep(c("AA", "AH", "HA", "HH"), times = 3)
 n = 10
 
 guide = data.frame(user, date, tube = c(1:n),
-                   lineage = sample(lineages, size = n, replace = T),
+                   lineage = sample(lineages, size = n, replace = F),
                    replicate = NA)
 
 file_name = gsub(x = date, pattern = "-", replacement = "_")
