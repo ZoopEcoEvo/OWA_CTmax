@@ -24,12 +24,12 @@ if(length(new_runs) > 0){ # If there are new data files to process...
     file_name = new_runs[f] 
     runs = c(runs, file_name)
     
-    run_id = if_else(is.na(prev_runs), 1, as.numeric(length(prev_runs) + f))
+    run_id = if_else(is.na(prev_runs), 1, as.numeric(length(prev_runs) + f))[1]
     
     # Loads data from temperature sensors (logging at 5 second intervals)
     temp_data = read_csv(paste("Data/temperature_data/", file_name, "_temp.CSV", collapse = "", sep = "")) %>% 
-      mutate("Time" = lubridate::hms(Time),
-             "Date" = lubridate::as_date(Date)) %>% 
+      mutate("Time" = lubridate::hms(Time)) %>% 
+             #"Date" = lubridate::as_date(Date)) %>% 
       mutate("time_point" = row_number(), # Assigns each time point a sequential value
              "second_passed" = lubridate::time_length(Time - first(Time)), # Calculates the time passed in seconds since logging began
              "minute_passed" = second_passed / 60,
