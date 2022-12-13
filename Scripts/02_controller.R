@@ -3,7 +3,7 @@ library(rmarkdown)
 library(tidyverse)
 
 #Determine which scripts should be run
-process_all_data = F #Runs data analysis for all files, rather than just new files
+process_all_data = T #Runs data analysis for all files, rather than just new files
 make_report = T #Runs project summary
 knit_manuscript = F #Compiles manuscript draft
 
