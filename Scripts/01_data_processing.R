@@ -24,7 +24,11 @@ if(length(new_runs) > 0){ # If there are new data files to process...
     file_name = new_runs[f] 
     runs = c(runs, file_name)
     
-    run_id = if_else(is.na(prev_runs), 1, as.numeric(length(prev_runs) + f))[1]
+    if(is.na(prev_runs) & is.null(runs)){
+      run_id = 1
+    }else{
+      run_id = as.numeric(length(prev_runs)) + (f-1)
+    }
     
     # Loads data from temperature sensors (logging at 5 second intervals)
     temp_data = read_csv(paste("Data/temperature_data/", file_name, "_temp.CSV", collapse = "", sep = "")) %>% 

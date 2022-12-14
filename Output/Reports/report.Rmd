@@ -59,7 +59,7 @@ full_data %>%
 All copepods were measured after the CTmax assay. These length measurements are shown below. 
 ```{r lineage-lengths, fig.height=5, fig.width=5}
 ggplot(full_data, aes(x = lineage, y = length, fill = lineage)) + 
-  geom_boxplot() + 
+  geom_boxplot(outlier.colour = NA) + 
   geom_point(size = 2, position = position_jitter(width = 0.1, height = 0)) + 
   scale_fill_manual(values = lineage_cols) + 
   labs(x = "Lineage", 
@@ -95,7 +95,7 @@ Individuals are monitored until they reach their thermal limit, indicated by a l
 
 ```{r lineage-ctmax, fig.height=5, fig.width=5}
 ggplot(full_data, aes(x = lineage, y = ctmax, fill = lineage)) + 
-  geom_boxplot() + 
+  geom_boxplot(outlier.colour = NA) + 
   geom_point(position = position_jitter(width = 0.1, height = 0)) + 
   scale_fill_manual(values = lineage_cols) + 
   labs(x = "Lineage", 
