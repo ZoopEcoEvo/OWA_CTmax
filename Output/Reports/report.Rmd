@@ -24,19 +24,28 @@ knitr::opts_chunk$set(
   dev = c("png", "pdf")
 )
 
-theme_matt = function(base_size){
+theme_matt = function(base_size = 18,
+                      dark_text = "grey20"){
+  mid_text <-  monochromeR::generate_palette(dark_text, "go_lighter", n_colours = 5)[2]
+  light_text <-  monochromeR::generate_palette(dark_text, "go_lighter", n_colours = 5)[3]
+  
   ggpubr::theme_pubr(base_family="sans") %+replace% 
     theme(
       panel.background  = element_blank(),
       plot.background = element_rect(fill="transparent", colour=NA), 
       legend.background = element_rect(fill="transparent", colour=NA),
       legend.key = element_rect(fill="transparent", colour=NA),
+      text = element_text(colour = mid_text, lineheight = 1.1),
+      title = element_text(size = base_size * 1.5,
+                           colour = dark_text),
+      axis.text = element_text(size = base_size,
+                               colour = mid_text),
+      axis.title = element_text(size = base_size * 1.2,
+                                margin = margin(0, 8, 0, 0)),
       legend.text = element_text(size=base_size * 0.9),
       legend.title = element_text(size = base_size * 0.9, 
                                   face = "bold"),
-      axis.text = element_text(size = base_size),
-      axis.title = element_text(size = base_size * 1.2),
-      title = element_text(size = base_size * 1.55)
+      plot.margin = margin(0.25, 0.25, 0.25, 0.25,"cm")
     )
 }
 
@@ -64,7 +73,7 @@ ggplot(full_data, aes(x = lineage, y = length, fill = lineage)) +
   scale_fill_manual(values = lineage_cols) + 
   labs(x = "Lineage", 
        y = "Length (mm)") + 
-  theme_matt(base_size = 18) + 
+  theme_matt(base_size = 16) + 
   theme(legend.position = "none")
 ```
 
@@ -100,7 +109,7 @@ ggplot(full_data, aes(x = lineage, y = ctmax, fill = lineage)) +
   scale_fill_manual(values = lineage_cols) + 
   labs(x = "Lineage", 
        y = "CTmax (degrees C)") + 
-  theme_matt(base_size = 18) + 
+  theme_matt(base_size = 16) + 
   theme(legend.position = "none")
 ```
 
@@ -114,7 +123,7 @@ ggplot(full_data, aes(x = length, y = ctmax)) +
   scale_colour_manual(values = lineage_cols) + 
   labs(x = "Length (mm)", 
        y = "CTmax (degrees C)") + 
-  theme_matt(base_size = 18) + 
+  theme_matt(base_size = 16) + 
   theme(legend.position = "bottom")
 ```
 
