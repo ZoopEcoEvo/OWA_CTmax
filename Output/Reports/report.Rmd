@@ -6,7 +6,7 @@ output:
           code_folding: hide
           code_download: true
           toc: true
-          toc_float: true
+          toc_float: true 
   github_document:
           html_preview: false
           toc: true

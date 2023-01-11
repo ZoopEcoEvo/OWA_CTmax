@@ -29,7 +29,7 @@ header-includes:
   \newcommand{\beginsupplement}{\setcounter{table}{0}  \renewcommand{\thetable}{S\arabic{table}} \setcounter{figure}{0} \renewcommand{\thefigure}{S\arabic{figure}}}
 ---
 
-# Introduction {.unnumbered}
+# Introduction {.unnumbered}    
 
 # Methods {.unnumbered}    
 ## Statistical Analysis {.unnumbered}   
@@ -38,11 +38,12 @@ header-includes:
 ```{r, figure, echo = F, out.width = "300px"}
 #| fig.cap = "CAPTION HERE."
 
-knitr::include_graphics("../Output/Figures/_PATH_")
+#knitr::include_graphics("../Output/Figures/_PATH_")
 ```
 
 ```{r, table, echo = F}
-kable(digits = 3, align = "c",
+kable(x = 1, #replace 1 with whatever object you want to include as a table
+      digits = 3, align = "c",
       caption = "CAPTION HERE")
 ```
 
@@ -59,6 +60,6 @@ kable(digits = 3, align = "c",
 ```{r supp-fig-1, echo = F, out.width = "300px"}
 #| fig.cap = "CAPTION HERE."
 
-knitr::include_graphics("../Output/Figures/_PATH_")
+#knitr::include_graphics("../Output/Figures/_PATH_")
 ```
 
