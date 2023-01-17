@@ -6,7 +6,7 @@ library(tidyverse)
 #Determine which scripts should be run
 process_all_data = F #Runs data analysis for all files, rather than just new files
 make_report = T #Runs project summary
-#knit_manuscript = F #Compiles manuscript draft
+knit_manuscript = F #Compiles manuscript draft
 
 # Runs data analysis (data is read in during the for loop; nothing to read in here)
 source(file = "Scripts/01_data_processing.R")

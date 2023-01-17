@@ -1,6 +1,6 @@
 OWA Lineage CTmax Project
 ================
-2023-01-10
+2023-01-16
 
 - <a href="#sample-sizes" id="toc-sample-sizes">Sample sizes</a>
 - <a href="#trait-measurements" id="toc-trait-measurements">Trait
@@ -12,7 +12,7 @@ OWA Lineage CTmax Project
 
 # Sample sizes
 
-This summary reports the results of 4 replicate CTmax trials. The four
+This summary reports the results of 5 replicate CTmax trials. The four
 lineages were sampled randomly for each replicate experiment, with one
 replicate culture per lineage per run.
 
@@ -24,10 +24,10 @@ full_data %>%
 
 | lineage |   n |
 |:--------|----:|
-| AA      |  11 |
-| AH      |   8 |
-| HA      |  13 |
-| HH      |   8 |
+| AA      |  13 |
+| AH      |  11 |
+| HA      |  15 |
+| HH      |  11 |
 
 # Trait measurements
 
@@ -48,6 +48,38 @@ ggplot(full_data, aes(x = lineage, y = length, fill = lineage)) +
 ```
 
 <img src="../Figures/markdown/lineage-lengths-1.png" style="display: block; margin: auto;" />
+
+Just to note, a couple individuals appear to be on the small side, which
+risks the introduction of both C6 and juvenile individuals.
+
+``` r
+ggplot(full_data, aes(x = length)) + 
+  geom_histogram(binwidth = 0.01) + 
+  theme_matt() + 
+  theme_matt(base_size = 16) + 
+  theme(legend.position = "none")
+```
+
+<img src="../Figures/markdown/unnamed-chunk-1-1.png" style="display: block; margin: auto;" />
+
+``` r
+full_data %>% 
+  filter(length > 0.72) %>% 
+ggplot(aes(x = lineage, y = length, fill = lineage)) + 
+  geom_boxplot(outlier.colour = NA) + 
+  geom_point(size = 2, position = position_jitter(width = 0.1, height = 0)) + 
+  scale_fill_manual(values = lineage_cols) + 
+  labs(x = "Lineage", 
+       y = "Length (mm)") + 
+  theme_matt(base_size = 16) + 
+  theme(legend.position = "none")
+```
+
+<img src="../Figures/markdown/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
+
+For CTmax boxplots, we’ll focus on just individuals with body sizes
+larger than 0.72 mm. This is a temporary arbitrary cut-off based on
+where the breaks in body size data appeared.
 
 ## CTmax
 
@@ -87,7 +119,9 @@ considered an “ecological death” endpoint. Measured CTmax values are
 shown below.
 
 ``` r
-ggplot(full_data, aes(x = lineage, y = ctmax, fill = lineage)) + 
+full_data %>% 
+  filter(length > 0.72) %>% 
+ggplot(aes(x = lineage, y = ctmax, fill = lineage)) + 
   geom_boxplot(outlier.colour = NA) + 
   geom_point(position = position_jitter(width = 0.1, height = 0)) + 
   scale_fill_manual(values = lineage_cols) + 
@@ -101,9 +135,13 @@ ggplot(full_data, aes(x = lineage, y = ctmax, fill = lineage)) +
 
 # Trait correlations
 
-Across species, thermal limits tend to decrease with increasing body
+Across lineages, thermal limits tend to decrease with increasing body
 size. The relationship between measured lengths and CTmax from these
-assays is shown below.
+assays is shown below. This figure includes all individuals (even those
+smaller than 0.72mm) - this highlights why exclusion of the smaller
+individuals is worth considering. Since smaller individuals tend to be
+from the HA and HH lineages, these might have CTmax values that seem
+higher than in reality.
 
 ``` r
 ggplot(full_data, aes(x = length, y = ctmax)) + 

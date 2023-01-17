@@ -24,10 +24,10 @@ if(length(new_runs) > 0){ # If there are new data files to process...
     file_name = new_runs[f] 
     runs = c(runs, file_name)
     
-    if(is.na(prev_runs) & is.null(runs)){
+    if(length(file_list) == 1){
       run_id = 1
     }else{
-      run_id = as.numeric(length(prev_runs)) + (f-1)
+      run_id = sum(!is.na(prev_runs)) + f
     }
     
     # Loads data from temperature sensors (logging at 5 second intervals)
