@@ -1,6 +1,6 @@
 OWA Lineage CTmax Project
 ================
-2023-01-16
+2023-01-17
 
 - <a href="#sample-sizes" id="toc-sample-sizes">Sample sizes</a>
 - <a href="#trait-measurements" id="toc-trait-measurements">Trait
@@ -78,8 +78,9 @@ ggplot(aes(x = lineage, y = length, fill = lineage)) +
 <img src="../Figures/markdown/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
 
 For CTmax boxplots, we’ll focus on just individuals with body sizes
-larger than 0.72 mm. This is a temporary arbitrary cut-off based on
-where the breaks in body size data appeared.
+larger than 0.72 mm. This is a **temporary and arbitrary** cut-off based
+on where the break in body size data appears and the expected sizes of
+C5 vs C6 females in these cultures.
 
 ## CTmax
 
@@ -132,6 +133,45 @@ ggplot(aes(x = lineage, y = ctmax, fill = lineage)) +
 ```
 
 <img src="../Figures/markdown/lineage-ctmax-1.png" style="display: block; margin: auto;" />
+
+To test for differences between lineages, we fit a linear mixed effects
+model to the data (CTmax \~ lineage, with a nested random effect of
+replicate within lineage). There’s currently no significant difference
+between lineages.
+
+``` r
+ctmax.model = nlme::lme(ctmax ~ lineage, 
+                        random = ~1|lineage/replicate, 
+                        data = filter(full_data, length > 0.72))
+
+kable(car::Anova(ctmax.model))
+```
+
+|         |    Chisq |  Df | Pr(\>Chisq) |
+|:--------|---------:|----:|------------:|
+| lineage | 1.796353 |   3 |   0.6157288 |
+
+While this is surprising at first glance, it appears to be driven by the
+large variation within lineages observed. Shown below are the CTmax
+values for each of the four lineages, separated out into the different
+replicate cultures copepods were selected from. In the AH and HA
+lineages in particular there seems to be some strong variation between
+replicates.
+
+``` r
+full_data %>% 
+ggplot(aes(x = replicate, y = ctmax, fill = lineage, group = replicate)) + 
+  facet_wrap(lineage~.) + 
+  geom_boxplot(outlier.colour = NA) + 
+  geom_point(position = position_jitter(width = 0.1, height = 0)) + 
+  scale_fill_manual(values = lineage_cols) + 
+  labs(x = "Lineage", 
+       y = "CTmax (degrees C)") + 
+  theme_matt(base_size = 16) + 
+  theme(legend.position = "none")
+```
+
+<img src="../Figures/markdown/unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
 
 # Trait correlations
 
