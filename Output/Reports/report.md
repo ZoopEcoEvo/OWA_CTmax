@@ -1,6 +1,6 @@
 OWA Lineage CTmax Project
 ================
-2023-01-17
+2023-01-28
 
 - <a href="#sample-sizes" id="toc-sample-sizes">Sample sizes</a>
 - <a href="#trait-measurements" id="toc-trait-measurements">Trait
@@ -12,7 +12,7 @@ OWA Lineage CTmax Project
 
 # Sample sizes
 
-This summary reports the results of 5 replicate CTmax trials. The four
+This summary reports the results of 7 replicate CTmax trials. The four
 lineages were sampled randomly for each replicate experiment, with one
 replicate culture per lineage per run.
 
@@ -24,10 +24,10 @@ full_data %>%
 
 | lineage |   n |
 |:--------|----:|
-| AA      |  13 |
-| AH      |  11 |
-| HA      |  15 |
-| HH      |  11 |
+| AA      |  16 |
+| AH      |  16 |
+| HA      |  19 |
+| HH      |  19 |
 
 # Trait measurements
 
@@ -62,31 +62,11 @@ ggplot(full_data, aes(x = length)) +
 
 <img src="../Figures/markdown/unnamed-chunk-1-1.png" style="display: block; margin: auto;" />
 
-``` r
-full_data %>% 
-  filter(length > 0.72) %>% 
-ggplot(aes(x = lineage, y = length, fill = lineage)) + 
-  geom_boxplot(outlier.colour = NA) + 
-  geom_point(size = 2, position = position_jitter(width = 0.1, height = 0)) + 
-  scale_fill_manual(values = lineage_cols) + 
-  labs(x = "Lineage", 
-       y = "Length (mm)") + 
-  theme_matt(base_size = 16) + 
-  theme(legend.position = "none")
-```
-
-<img src="../Figures/markdown/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
-
-For CTmax boxplots, we’ll focus on just individuals with body sizes
-larger than 0.72 mm. This is a **temporary and arbitrary** cut-off based
-on where the break in body size data appears and the expected sizes of
-C5 vs C6 females in these cultures.
-
 ## CTmax
 
-The focal trait was the thermal limit, measured here as CTmax - the
-critical thermal maximum. During these assays, temperature increases at
-a rate of 0.1-0.3 degrees C per minute. As shown below, ramping rate
+The focal trait was the upper thermal limit, measured here as CTmax -
+the critical thermal maximum. During these assays, temperature increases
+at a rate of 0.1-0.3 degrees C per minute. As shown below, ramping rate
 decreases linearly over time due to imperfect insulation of the water
 bath reservoir. Rates are always between 0.3 and 0.1 degrees C per
 minute, however, which is the range of ramping rates typically used in
@@ -117,11 +97,14 @@ ggplot(ramp_record2, aes(x = minute_interval, y = mean_ramp)) +
 Individuals are monitored until they reach their thermal limit,
 indicated by a lack of responsiveness to stimuli. This is traditionally
 considered an “ecological death” endpoint. Measured CTmax values are
-shown below.
+shown below. A few anomalously low CTmax values (\<33 degrees C) were
+excluded. There were four total measurements excluded (n = 1 from AA, 2
+from AH, and 1 from HA).
 
 ``` r
 full_data %>% 
-  filter(length > 0.72) %>% 
+  #filter(length > 0.72) %>% 
+  filter(ctmax > 33) %>% 
 ggplot(aes(x = lineage, y = ctmax, fill = lineage)) + 
   geom_boxplot(outlier.colour = NA) + 
   geom_point(position = position_jitter(width = 0.1, height = 0)) + 
@@ -135,32 +118,40 @@ ggplot(aes(x = lineage, y = ctmax, fill = lineage)) +
 <img src="../Figures/markdown/lineage-ctmax-1.png" style="display: block; margin: auto;" />
 
 To test for differences between lineages, we fit a linear mixed effects
-model to the data (CTmax \~ lineage, with a nested random effect of
-replicate within lineage). There’s currently no significant difference
-between lineages.
+model to the data (CTmax \~ lineage + length, with a nested random
+effect of replicate within lineage). There’s currently no significant
+difference between lineages, but there is a significant effect of
+length.
 
 ``` r
-ctmax.model = nlme::lme(ctmax ~ lineage, 
+ctmax.model = nlme::lme(ctmax ~ lineage + length, 
                         random = ~1|lineage/replicate, 
-                        data = filter(full_data, length > 0.72))
+                        data = filter(full_data, ctmax > 33))
 
 kable(car::Anova(ctmax.model))
 ```
 
 |         |    Chisq |  Df | Pr(\>Chisq) |
 |:--------|---------:|----:|------------:|
-| lineage | 1.796353 |   3 |   0.6157288 |
+| lineage | 4.562379 |   3 |   0.2067932 |
+| length  | 4.185299 |   1 |   0.0407760 |
 
-While this is surprising at first glance, it appears to be driven by the
-large variation within lineages observed. Shown below are the CTmax
-values for each of the four lineages, separated out into the different
-replicate cultures copepods were selected from. In the AH and HA
-lineages in particular there seems to be some strong variation between
-replicates.
+``` r
+
+#model_resid = resid(ctmax.model, type = 'pearson')
+#qqnorm(model_resid); qqline(model_resid, col = 2)
+```
+
+While this is surprising at first glance, it appears to be driven by
+large variation within lineages. Shown below are the CTmax values for
+each of the four lineages, separated out into the different replicate
+cultures copepods were selected from. In the AH and HA lineages in
+particular there seems to be some strong variation between replicates.
 
 ``` r
 full_data %>% 
-ggplot(aes(x = replicate, y = ctmax, fill = lineage, group = replicate)) + 
+    filter(ctmax > 33) %>% 
+  ggplot(aes(x = replicate, y = ctmax, fill = lineage, group = replicate)) + 
   facet_wrap(lineage~.) + 
   geom_boxplot(outlier.colour = NA) + 
   geom_point(position = position_jitter(width = 0.1, height = 0)) + 
@@ -171,20 +162,21 @@ ggplot(aes(x = replicate, y = ctmax, fill = lineage, group = replicate)) +
   theme(legend.position = "none")
 ```
 
-<img src="../Figures/markdown/unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
+<img src="../Figures/markdown/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
 
 # Trait correlations
 
 Across lineages, thermal limits tend to decrease with increasing body
 size. The relationship between measured lengths and CTmax from these
-assays is shown below. This figure includes all individuals (even those
-smaller than 0.72mm) - this highlights why exclusion of the smaller
-individuals is worth considering. Since smaller individuals tend to be
-from the HA and HH lineages, these might have CTmax values that seem
-higher than in reality.
+assays is shown below. Note that the smaller individuals (lengths
+\<0.75mm) tend to be from the HA and HH lineages. It might be worth
+going back to the images to double check the stage of these individuals
+to ensure only adult females were included.
 
 ``` r
-ggplot(full_data, aes(x = length, y = ctmax)) + 
+full_data %>% 
+    filter(ctmax > 33) %>% 
+  ggplot(aes(x = length, y = ctmax)) + 
   geom_smooth(method = "lm", colour = "black") + 
   geom_point(size = 3, aes(colour = lineage)) + 
   scale_colour_manual(values = lineage_cols) + 
