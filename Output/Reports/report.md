@@ -1,6 +1,6 @@
 OWA Lineage CTmax Project
 ================
-2023-01-28
+2023-02-04
 
 - <a href="#sample-sizes" id="toc-sample-sizes">Sample sizes</a>
 - <a href="#trait-measurements" id="toc-trait-measurements">Trait
@@ -12,7 +12,7 @@ OWA Lineage CTmax Project
 
 # Sample sizes
 
-This summary reports the results of 7 replicate CTmax trials. The four
+This summary reports the results of 8 replicate CTmax trials. The four
 lineages were sampled randomly for each replicate experiment, with one
 replicate culture per lineage per run.
 
@@ -24,10 +24,10 @@ full_data %>%
 
 | lineage |   n |
 |:--------|----:|
-| AA      |  16 |
-| AH      |  16 |
-| HA      |  19 |
-| HH      |  19 |
+| AA      |  17 |
+| AH      |  21 |
+| HA      |  22 |
+| HH      |  20 |
 
 # Trait measurements
 
@@ -133,8 +133,8 @@ kable(car::Anova(ctmax.model))
 
 |         |    Chisq |  Df | Pr(\>Chisq) |
 |:--------|---------:|----:|------------:|
-| lineage | 4.562379 |   3 |   0.2067932 |
-| length  | 4.185299 |   1 |   0.0407760 |
+| lineage | 5.910100 |   3 |   0.1160669 |
+| length  | 9.590888 |   1 |   0.0019555 |
 
 ``` r
 
