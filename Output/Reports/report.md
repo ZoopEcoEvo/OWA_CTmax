@@ -52,16 +52,6 @@ ggplot(full_data, aes(x = lineage, y = length, fill = lineage)) +
 Just to note, a couple individuals appear to be on the small side, which
 risks the introduction of both C6 and juvenile individuals.
 
-``` r
-ggplot(full_data, aes(x = length)) + 
-  geom_histogram(binwidth = 0.01) + 
-  theme_matt() + 
-  theme_matt(base_size = 16) + 
-  theme(legend.position = "none")
-```
-
-<img src="../Figures/markdown/unnamed-chunk-1-1.png" style="display: block; margin: auto;" />
-
 ## CTmax
 
 The focal trait was the upper thermal limit, measured here as CTmax -
@@ -98,14 +88,28 @@ Individuals are monitored until they reach their thermal limit,
 indicated by a lack of responsiveness to stimuli. This is traditionally
 considered an “ecological death” endpoint. Measured CTmax values are
 shown below. A few anomalously low CTmax values (\<33 degrees C) were
-excluded. There were four total measurements excluded (n = 1 from AA, 2
-from AH, and 1 from HA).
+excluded. There were 6\` total measurements excluded, summarize below.
+
+``` r
+kable(full_data %>% 
+        filter(ctmax < 33) %>% 
+        count(lineage), 
+      caption = "Number of individual measurements excluded from each of the lineages")
+```
+
+| lineage |   n |
+|:--------|----:|
+| AA      |   1 |
+| AH      |   3 |
+| HA      |   2 |
+
+Number of individual measurements excluded from each of the lineages
 
 ``` r
 full_data %>% 
   #filter(length > 0.72) %>% 
   filter(ctmax > 33) %>% 
-ggplot(aes(x = lineage, y = ctmax, fill = lineage)) + 
+  ggplot(aes(x = lineage, y = ctmax, fill = lineage)) + 
   geom_boxplot(outlier.colour = NA) + 
   geom_point(position = position_jitter(width = 0.1, height = 0)) + 
   scale_fill_manual(values = lineage_cols) + 
@@ -121,7 +125,8 @@ To test for differences between lineages, we fit a linear mixed effects
 model to the data (CTmax \~ lineage + length, with a nested random
 effect of replicate within lineage). There’s currently no significant
 difference between lineages, but there is a significant effect of
-length.
+length. We still need to do a posthoc test to examine pairwise
+differences between lineages.
 
 ``` r
 ctmax.model = nlme::lme(ctmax ~ lineage + length, 
@@ -142,28 +147,6 @@ kable(car::Anova(ctmax.model))
 #qqnorm(model_resid); qqline(model_resid, col = 2)
 ```
 
-While this is surprising at first glance, it appears to be driven by
-large variation within lineages. Shown below are the CTmax values for
-each of the four lineages, separated out into the different replicate
-cultures copepods were selected from. In the AH and HA lineages in
-particular there seems to be some strong variation between replicates.
-
-``` r
-full_data %>% 
-    filter(ctmax > 33) %>% 
-  ggplot(aes(x = replicate, y = ctmax, fill = lineage, group = replicate)) + 
-  facet_wrap(lineage~.) + 
-  geom_boxplot(outlier.colour = NA) + 
-  geom_point(position = position_jitter(width = 0.1, height = 0)) + 
-  scale_fill_manual(values = lineage_cols) + 
-  labs(x = "Lineage", 
-       y = "CTmax (degrees C)") + 
-  theme_matt(base_size = 16) + 
-  theme(legend.position = "none")
-```
-
-<img src="../Figures/markdown/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
-
 # Trait correlations
 
 Across lineages, thermal limits tend to decrease with increasing body
@@ -175,7 +158,7 @@ to ensure only adult females were included.
 
 ``` r
 full_data %>% 
-    filter(ctmax > 33) %>% 
+  filter(ctmax > 33) %>% 
   ggplot(aes(x = length, y = ctmax)) + 
   geom_smooth(method = "lm", colour = "black") + 
   geom_point(size = 3, aes(colour = lineage)) + 

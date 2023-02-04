@@ -78,7 +78,7 @@ ggplot(full_data, aes(x = lineage, y = length, fill = lineage)) +
 ```
 
 Just to note, a couple individuals appear to be on the small side, which risks the introduction of both C6 and juvenile individuals. 
-```{r}
+```{r, include = F}
 ggplot(full_data, aes(x = length)) + 
   geom_histogram(binwidth = 0.01) + 
   theme_matt() + 
@@ -109,13 +109,21 @@ ggplot(ramp_record2, aes(x = minute_interval, y = mean_ramp)) +
         legend.direction = "horizontal")
 ```
 
-Individuals are monitored until they reach their thermal limit, indicated by a lack of responsiveness to stimuli. This is traditionally considered an "ecological death" endpoint. Measured CTmax values are shown below. A few anomalously low CTmax values (<33 degrees C) were excluded. There were four total measurements excluded (n = 1 from AA, 2 from AH, and 1 from HA).
+Individuals are monitored until they reach their thermal limit, indicated by a lack of responsiveness to stimuli. This is traditionally considered an "ecological death" endpoint. Measured CTmax values are shown below. A few anomalously low CTmax values (<33 degrees C) were excluded. There were `r dim(full_data %>% filter(ctmax < 33))[1]`` total measurements excluded, summarize below.
+
+```{r}
+kable(full_data %>% 
+        filter(ctmax < 33) %>% 
+        count(lineage), 
+      caption = "Number of individual measurements excluded from each of the lineages")
+```
+
 
 ```{r lineage-ctmax, fig.height=5, fig.width=5}
 full_data %>% 
   #filter(length > 0.72) %>% 
   filter(ctmax > 33) %>% 
-ggplot(aes(x = lineage, y = ctmax, fill = lineage)) + 
+  ggplot(aes(x = lineage, y = ctmax, fill = lineage)) + 
   geom_boxplot(outlier.colour = NA) + 
   geom_point(position = position_jitter(width = 0.1, height = 0)) + 
   scale_fill_manual(values = lineage_cols) + 
@@ -125,7 +133,8 @@ ggplot(aes(x = lineage, y = ctmax, fill = lineage)) +
   theme(legend.position = "none")
 ```
 
-To test for differences between lineages, we fit a linear mixed effects model to the data (CTmax ~ lineage + length, with a nested random effect of replicate within lineage). There's currently no significant difference between lineages, but there is a significant effect of length. 
+To test for differences between lineages, we fit a linear mixed effects model to the data (CTmax ~ lineage + length, with a nested random effect of replicate within lineage). There's currently no significant difference between lineages, but there is a significant effect of length. We still need to do a posthoc test to examine pairwise differences between lineages. 
+
 ```{r}
 ctmax.model = nlme::lme(ctmax ~ lineage + length, 
                         random = ~1|lineage/replicate, 
@@ -137,11 +146,12 @@ kable(car::Anova(ctmax.model))
 #qqnorm(model_resid); qqline(model_resid, col = 2)
 ```
 
-While this is surprising at first glance, it appears to be driven by large variation within lineages. Shown below are the CTmax values for each of the four lineages, separated out into the different replicate cultures copepods were selected from. In the AH and HA lineages in particular there seems to be some strong variation between replicates. 
 
-```{r}
+```{r, include = F}
+# While this is surprising at first glance, it appears to be driven by large variation within lineages. Shown below are the CTmax values for each of the four lineages, separated out into the different replicate cultures copepods were selected from. In the AH and HA lineages in particular there seems to be some strong variation between replicates. 
+
 full_data %>% 
-    filter(ctmax > 33) %>% 
+  filter(ctmax > 33) %>% 
   ggplot(aes(x = replicate, y = ctmax, fill = lineage, group = replicate)) + 
   facet_wrap(lineage~.) + 
   geom_boxplot(outlier.colour = NA) + 
@@ -156,8 +166,8 @@ full_data %>%
 ```{r include = F}
 # Examines the relationships between CTmax and length within each lineage, with points colored by replicate. Attempting to look at why the AH and HA lineages are so much more variable across replicates than the AA or HH lineages.
 full_data %>% 
-    filter(ctmax > 33) %>% 
-ggplot(aes(x = length, y = ctmax)) + 
+  filter(ctmax > 33) %>% 
+  ggplot(aes(x = length, y = ctmax)) + 
   facet_wrap(lineage~.) + 
   geom_point(aes(colour = factor(replicate)), 
              size = 2) + 
@@ -174,7 +184,7 @@ Across lineages, thermal limits tend to decrease with increasing body size. The 
 
 ```{r length-ctmax, fig.height=5, fig.width=5}
 full_data %>% 
-    filter(ctmax > 33) %>% 
+  filter(ctmax > 33) %>% 
   ggplot(aes(x = length, y = ctmax)) + 
   geom_smooth(method = "lm", colour = "black") + 
   geom_point(size = 3, aes(colour = lineage)) + 
