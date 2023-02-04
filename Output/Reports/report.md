@@ -147,6 +147,41 @@ kable(car::Anova(ctmax.model))
 #qqnorm(model_resid); qqline(model_resid, col = 2)
 ```
 
+We also examined whether the individual environmental factors
+(temperature or CO2 levels) affected CTmax. Culturing temperature
+appears to have a significant effect on CTmax, while CO2 level does not.
+Further, there is no interaction between the two factors, suggesting
+that CO2 level does not alter the effect that temperature has on CTmax.
+
+``` r
+env.model = nlme::lme(ctmax ~ temp * co2, 
+                        random = ~1|lineage/replicate, 
+                        data = filter(full_data, ctmax > 33))
+
+kable(car::Anova(env.model, test = "F", type = "III"))
+```
+
+|             |        Chisq |  Df | Pr(\>Chisq) |
+|:------------|-------------:|----:|------------:|
+| (Intercept) | 5226.5137842 |   1 |   0.0000000 |
+| temp        |    3.3992075 |   1 |   0.0652277 |
+| co2         |    0.0344067 |   1 |   0.8528443 |
+| temp:co2    |    0.0115227 |   1 |   0.9145161 |
+
+``` r
+
+table(full_data$lineage, full_data$replicate)
+##     
+##       1  2  3  4
+##   AA  6  2  7  2
+##   AH  8  8  2  3
+##   HA  2  8  2 10
+##   HH  7  4  7  2
+
+#env.model_resid = resid(env.model, type = 'pearson')
+#qqnorm(env.model_resid); qqline(env.model_resid, col = 2)
+```
+
 # Trait correlations
 
 Across lineages, thermal limits tend to decrease with increasing body

@@ -53,6 +53,12 @@ lineage_cols = c("AA" = "#0C7BDF",
                  "AH" = "#009D77", 
                  "HA" = "#FFA602", 
                  "HH" = "#D55D07")
+
+full_data = full_data %>%  
+  mutate(temp = str_split_i(lineage, pattern = "", i = 1),
+         co2 = str_split_i(lineage, pattern = "", i = 2),
+         temp = if_else(temp == "H", "High", "Ambient"),
+         co2 = if_else(co2 == "H", "High", "Ambient"))
 ```
 
 # Sample sizes
@@ -146,6 +152,19 @@ kable(car::Anova(ctmax.model))
 #qqnorm(model_resid); qqline(model_resid, col = 2)
 ```
 
+We also examined whether the individual environmental factors (temperature or CO2 levels) affected CTmax. Culturing temperature appears to have a significant effect on CTmax, while CO2 level does not. Further, there is no interaction between the two factors, suggesting that CO2 level does not alter the effect that temperature has on CTmax. 
+```{r}
+env.model = nlme::lme(ctmax ~ temp * co2, 
+                        random = ~1|lineage/replicate, 
+                        data = filter(full_data, ctmax > 33))
+
+kable(car::Anova(env.model, test = "F", type = "III"))
+
+table(full_data$lineage, full_data$replicate)
+
+#env.model_resid = resid(env.model, type = 'pearson')
+#qqnorm(env.model_resid); qqline(env.model_resid, col = 2)
+```
 
 ```{r, include = F}
 # While this is surprising at first glance, it appears to be driven by large variation within lineages. Shown below are the CTmax values for each of the four lineages, separated out into the different replicate cultures copepods were selected from. In the AH and HA lineages in particular there seems to be some strong variation between replicates. 
