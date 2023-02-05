@@ -1,12 +1,14 @@
 OWA Lineage CTmax Project
 ================
-2023-02-04
+2023-02-05
 
 - <a href="#sample-sizes" id="toc-sample-sizes">Sample sizes</a>
 - <a href="#trait-measurements" id="toc-trait-measurements">Trait
   measurements</a>
   - <a href="#body-length" id="toc-body-length">Body length</a>
   - <a href="#ctmax" id="toc-ctmax">CTmax</a>
+- <a href="#estimation-plots" id="toc-estimation-plots">Estimation
+  Plots</a>
 - <a href="#trait-correlations" id="toc-trait-correlations">Trait
   correlations</a>
 
@@ -71,10 +73,8 @@ ramp_record2 = ramp_record %>%
 ggplot(ramp_record2, aes(x = minute_interval, y = mean_ramp)) + 
   geom_hline(yintercept = 0.3) + 
   geom_hline(yintercept = 0.1) + 
-  #geom_point() + 
   geom_hex(bins = 30) + 
-  #scale_fill_continuous(lim=c(2,25), na.value=NA) + 
-  #ylim(0,0.32) + 
+  ylim(0,0.34) + 
   labs(y = "Ramp Rate (deg. C / min.)",
        x = "Time into run (minute)") + 
   theme_matt(base_size = 16) + 
@@ -158,7 +158,7 @@ env.model = nlme::lme(ctmax ~ temp * co2,
                         random = ~1|lineage/replicate, 
                         data = filter(full_data, ctmax > 33))
 
-kable(car::Anova(env.model, test = "F", type = "III"))
+kable(car::Anova(env.model, type = "III"))
 ```
 
 |             |        Chisq |  Df | Pr(\>Chisq) |
@@ -170,17 +170,36 @@ kable(car::Anova(env.model, test = "F", type = "III"))
 
 ``` r
 
-table(full_data$lineage, full_data$replicate)
-##     
-##       1  2  3  4
-##   AA  6  2  7  2
-##   AH  8  8  2  3
-##   HA  2  8  2 10
-##   HH  7  4  7  2
-
 #env.model_resid = resid(env.model, type = 'pearson')
 #qqnorm(env.model_resid); qqline(env.model_resid, col = 2)
 ```
+
+# Estimation Plots
+
+Another approach we could use is to measure effect sizes, which can be
+visualized using estimation plots. The disadvantage here is that
+different replicates within lineages are not taken into account.
+However, in this form, the observed differences between temperature
+groups (rather than CO2 groups) is clear - lineages that develop at high
+temperatures have higher thermal limits, regardless of the CO2 level.
+
+``` r
+eff_sizes = full_data %>% 
+  filter(ctmax > 33) %>% 
+  dabest(lineage, ctmax, 
+         idx = c("AA", "AH", "HA", "HH"),
+         paired = FALSE
+         )
+
+mean_diff = eff_sizes %>% mean_diff()
+
+plot(mean_diff, 
+     rawplot.markersize = 3, 
+     palette = lineage_cols,
+     rawplot.ylabel = "CTmax (degrees C)")
+```
+
+<img src="../Figures/markdown/unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
 
 # Trait correlations
 

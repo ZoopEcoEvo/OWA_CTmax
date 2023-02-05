@@ -2,6 +2,7 @@
 library(rmarkdown)
 library(knitr)
 library(tidyverse)
+library(dabestr)
 
 #Determine which scripts should be run
 process_all_data = F #Runs data analysis for all files, rather than just new files
