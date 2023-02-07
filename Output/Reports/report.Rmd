@@ -69,6 +69,11 @@ full_data %>%
   knitr::kable()
 ```
 
+```{r include = F}
+table(full_data$lineage, full_data$replicate)
+```
+
+
 # Trait measurements    
 ## Body length
 All copepods were measured after the CTmax assay. These length measurements are shown below. 
@@ -83,13 +88,26 @@ ggplot(full_data, aes(x = lineage, y = length, fill = lineage)) +
   theme(legend.position = "none")
 ```
 
-Just to note, a couple individuals appear to be on the small side, which risks the introduction of both C6 and juvenile individuals. 
+Just to note, a couple individuals appear to be on the small side, which risks the introduction of both C6 and juvenile individuals. The smallest individual (length ~ 0.6mm) was excluded from analyses due to the likelihood it was not a mature individual. 
 ```{r, include = F}
 ggplot(full_data, aes(x = length)) + 
   geom_histogram(binwidth = 0.01) + 
   theme_matt() + 
   theme_matt(base_size = 16) + 
   theme(legend.position = "none")
+```
+
+After the small individual is excluded, there is no significant difference in size across the lineages. To test this, we fit a linear mixed effects model to the data (length ~ lineage, with a random effect of replicate culture). Note, here and in the other models replicate culture ID has been re-coded from 1-4, to a unique identifier (AA_1, AA_2, AA_3, AA_4, etc.). 
+```{r}
+use_data = full_data %>% 
+  filter(ctmax > 33 & length > 0.72) %>% 
+  mutate(id = paste(lineage, replicate, sep = "_"))
+
+length.model = nlme::lme(length ~ lineage, 
+                        random = ~1|id, 
+                        data = use_data)
+
+kable(car::Anova(length.model))
 ```
 
 ## CTmax    
@@ -113,21 +131,17 @@ ggplot(ramp_record2, aes(x = minute_interval, y = mean_ramp)) +
         legend.direction = "horizontal")
 ```
 
-Individuals are monitored until they reach their thermal limit, indicated by a lack of responsiveness to stimuli. This is traditionally considered an "ecological death" endpoint. Measured CTmax values are shown below. A few anomalously low CTmax values (<33 degrees C) were excluded. There were `r dim(full_data %>% filter(ctmax < 33))[1]`` total measurements excluded, summarize below.
+Individuals are monitored until they reach their thermal limit, indicated by a lack of responsiveness to stimuli. This is traditionally considered an "ecological death" endpoint. Measured CTmax values are shown below. A few anomalously low CTmax values (<33 degrees C) were excluded. There were `r dim(full_data %>% filter(ctmax < 33))[1]`` total measurements excluded, in addition to the measurement for the smallest individual, summarize below.
 
 ```{r}
 kable(full_data %>% 
-        filter(ctmax < 33) %>% 
+        filter(ctmax < 33 | length < 0.65) %>% 
         count(lineage), 
       caption = "Number of individual measurements excluded from each of the lineages")
 ```
 
-
 ```{r lineage-ctmax, fig.height=5, fig.width=5}
-full_data %>% 
-  #filter(length > 0.72) %>% 
-  filter(ctmax > 33) %>% 
-  ggplot(aes(x = lineage, y = ctmax, fill = lineage)) + 
+ggplot(use_data, aes(x = lineage, y = ctmax, fill = lineage)) + 
   geom_boxplot(outlier.colour = NA) + 
   geom_point(position = position_jitter(width = 0.1, height = 0)) + 
   scale_fill_manual(values = lineage_cols) + 
@@ -137,12 +151,12 @@ full_data %>%
   theme(legend.position = "none")
 ```
 
-To test for differences between lineages, we fit a linear mixed effects model to the data (CTmax ~ lineage + length, with a nested random effect of replicate within lineage). There's currently no significant difference between lineages, but there is a significant effect of length. We still need to do a posthoc test to examine pairwise differences between lineages. 
+To test for differences between lineages, we fit a linear mixed effects model to the data (CTmax ~ lineage + length, with a random effect of replicate culture). This model indicates significant difference between lineages, as well as a significant effect of length.
 
 ```{r}
-ctmax.model = nlme::lme(ctmax ~ lineage + length, 
-                        random = ~1|lineage/replicate, 
-                        data = filter(full_data, ctmax > 33))
+ctmax.model = nlme::lme(fixed = ctmax ~ lineage + length, 
+                        random = ~1|id, 
+                        data = use_data)
 
 kable(car::Anova(ctmax.model))
 
@@ -150,11 +164,17 @@ kable(car::Anova(ctmax.model))
 #qqnorm(model_resid); qqline(model_resid, col = 2)
 ```
 
-We also examined whether the individual environmental factors (temperature or CO2 levels) affected CTmax. Culturing temperature appears to have a significant effect on CTmax, while CO2 level does not. Further, there is no interaction between the two factors, suggesting that CO2 level does not alter the effect that temperature has on CTmax. 
+A posthoc test confirms that differences occur between the temperature groups, but not between the CO2 groups - that is, copepods from the high temperature lineages have higher CTmax values, regardless of the CO2 concentration.
+
 ```{r}
-env.model = nlme::lme(ctmax ~ temp * co2, 
-                        random = ~1|lineage/replicate, 
-                        data = filter(full_data, ctmax > 33))
+kable(emmeans::emmeans(ctmax.model, pairwise~lineage)$contrasts)
+```
+
+We also examined whether the individual environmental factors (temperature or CO2 levels) affected CTmax. Here again we show that culturing temperature appears to have a significant effect on CTmax, while CO2 level does not. Further, there is no interaction between the two factors, suggesting that CO2 level does not alter the effect that temperature has on CTmax. 
+```{r}
+env.model = nlme::lme(fixed = ctmax ~ temp * co2, 
+                        random = ~1|id, 
+                        data = use_data)
 
 kable(car::Anova(env.model, type = "III"))
 
@@ -165,9 +185,7 @@ kable(car::Anova(env.model, type = "III"))
 ```{r, include = F}
 # While this is surprising at first glance, it appears to be driven by large variation within lineages. Shown below are the CTmax values for each of the four lineages, separated out into the different replicate cultures copepods were selected from. In the AH and HA lineages in particular there seems to be some strong variation between replicates. 
 
-full_data %>% 
-  filter(ctmax > 33) %>% 
-  ggplot(aes(x = replicate, y = ctmax, fill = lineage, group = replicate)) + 
+ggplot(use_data, aes(x = replicate, y = ctmax, fill = lineage, group = replicate)) + 
   facet_wrap(lineage~.) + 
   geom_boxplot(outlier.colour = NA) + 
   geom_point(position = position_jitter(width = 0.1, height = 0)) + 
@@ -180,9 +198,7 @@ full_data %>%
 
 ```{r include = F}
 # Examines the relationships between CTmax and length within each lineage, with points colored by replicate. Attempting to look at why the AH and HA lineages are so much more variable across replicates than the AA or HH lineages.
-full_data %>% 
-  filter(ctmax > 33) %>% 
-  ggplot(aes(x = length, y = ctmax)) + 
+ggplot(use_data, aes(x = length, y = ctmax)) + 
   facet_wrap(lineage~.) + 
   geom_point(aes(colour = factor(replicate)), 
              size = 2) + 
@@ -196,14 +212,14 @@ full_data %>%
 # Estimation Plots 
 Another approach we could use is to measure effect sizes, which can be visualized using estimation plots. The disadvantage here is that different replicates within lineages are not taken into account. However, in this form, the observed differences between temperature groups (rather than CO2 groups) is clear - lineages that develop at high temperatures have higher thermal limits, regardless of the CO2 level. 
 ```{r}
-eff_sizes = full_data %>% 
-  filter(ctmax > 33) %>% 
+eff_sizes = use_data %>% 
   dabest(lineage, ctmax, 
          idx = c("AA", "AH", "HA", "HH"),
          paired = FALSE
          )
 
 mean_diff = eff_sizes %>% mean_diff()
+cohens = eff_sizes %>% cohens_d()
 
 plot(mean_diff, 
      rawplot.markersize = 3, 
@@ -217,7 +233,7 @@ Across lineages, thermal limits tend to decrease with increasing body size. The 
 
 ```{r length-ctmax, fig.height=5, fig.width=5}
 full_data %>% 
-  filter(ctmax > 33) %>% 
+  filter(ctmax > 33 & length > 0.72) %>% 
   ggplot(aes(x = length, y = ctmax)) + 
   geom_smooth(method = "lm", colour = "black") + 
   geom_point(size = 3, aes(colour = lineage)) + 

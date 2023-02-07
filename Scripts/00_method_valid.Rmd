@@ -91,3 +91,32 @@ ggplot(filter(tubes, trial == 2), aes(x = time, y = pH, group = tube, colour = f
   theme(panel.grid = element_blank(),
         legend.position = "none")
 ```
+
+# Power Analysis
+```{r}
+library(pwr)
+
+pwr.anova.test(k = 4, n = NULL, f = 0.6, sig.level = 0.05, power = 0.9)
+```
+
+```{r}
+library(simr)
+library(lme4)
+library(lmerTest)
+
+mod_data = filter(full_data, ctmax > 33 & length > 0.72) %>% 
+  mutate(id = paste(lineage, replicate, sep = "_")) 
+
+model = lmer(ctmax ~ lineage + (1|id), 
+                 data = mod_data)
+
+fixef(model)["lineageAH"] = -0.1 #originally = -0.13
+fixef(model)["lineageHA"] = 0.7 #originally = +1
+fixef(model)["lineageHH"] = 0.7 #originally = +0.9
+
+#Tests the power to reject the null hypothesis if effect sizes were slightly smaller than observed; 80% power is the typical (arbitrary) threshold for sufficient power
+powerSim(model, nsim = 100) #80% power - right on the border
+
+model2 = extend(model, within = "id", n = 10) #Tests what would happen if sample size within lineages was increased slightly
+curve2 = powerCurve(model2) #Improves power - probably worth it to run a couple more replicates
+```
