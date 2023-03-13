@@ -1,6 +1,6 @@
 OWA Lineage CTmax Project
 ================
-2023-02-06
+2023-03-12
 
 - <a href="#sample-sizes" id="toc-sample-sizes">Sample sizes</a>
 - <a href="#trait-measurements" id="toc-trait-measurements">Trait
@@ -224,22 +224,39 @@ groups (rather than CO2 groups) is clear - lineages that develop at high
 temperatures have higher thermal limits, regardless of the CO2 level.
 
 ``` r
-eff_sizes = use_data %>% 
+ctmax_eff_sizes = use_data %>% 
   dabest(lineage, ctmax, 
          idx = c("AA", "AH", "HA", "HH"),
          paired = FALSE
          )
 
-mean_diff = eff_sizes %>% mean_diff()
+ctmax_mean_diff = ctmax_eff_sizes %>% mean_diff()
 cohens = eff_sizes %>% cohens_d()
 
-plot(mean_diff, 
+plot(ctmax_mean_diff, 
      rawplot.markersize = 3, 
      palette = lineage_cols,
      rawplot.ylabel = "CTmax (degrees C)")
 ```
 
 <img src="../Figures/markdown/unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
+
+``` r
+size_eff_sizes = use_data %>% 
+  dabest(lineage, length, 
+         idx = c("AA", "AH", "HA", "HH"),
+         paired = FALSE
+         )
+
+length_mean_diff = size_eff_sizes %>% mean_diff()
+
+plot(length_mean_diff, 
+     rawplot.markersize = 3, 
+     palette = lineage_cols,
+     rawplot.ylabel = "Length (mm)")
+```
+
+<img src="../Figures/markdown/unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
 
 # Trait correlations
 

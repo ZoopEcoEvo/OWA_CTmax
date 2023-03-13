@@ -212,19 +212,34 @@ ggplot(use_data, aes(x = length, y = ctmax)) +
 # Estimation Plots 
 Another approach we could use is to measure effect sizes, which can be visualized using estimation plots. The disadvantage here is that different replicates within lineages are not taken into account. However, in this form, the observed differences between temperature groups (rather than CO2 groups) is clear - lineages that develop at high temperatures have higher thermal limits, regardless of the CO2 level. 
 ```{r}
-eff_sizes = use_data %>% 
+ctmax_eff_sizes = use_data %>% 
   dabest(lineage, ctmax, 
          idx = c("AA", "AH", "HA", "HH"),
          paired = FALSE
          )
 
-mean_diff = eff_sizes %>% mean_diff()
+ctmax_mean_diff = ctmax_eff_sizes %>% mean_diff()
 cohens = eff_sizes %>% cohens_d()
 
-plot(mean_diff, 
+plot(ctmax_mean_diff, 
      rawplot.markersize = 3, 
      palette = lineage_cols,
      rawplot.ylabel = "CTmax (degrees C)")
+```
+
+```{r}
+size_eff_sizes = use_data %>% 
+  dabest(lineage, length, 
+         idx = c("AA", "AH", "HA", "HH"),
+         paired = FALSE
+         )
+
+length_mean_diff = size_eff_sizes %>% mean_diff()
+
+plot(length_mean_diff, 
+     rawplot.markersize = 3, 
+     palette = lineage_cols,
+     rawplot.ylabel = "Length (mm)")
 ```
 
 
